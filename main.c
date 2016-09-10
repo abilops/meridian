@@ -4,6 +4,7 @@
 #include <math.h>
 #include <strings.h>
 #include <stdlib.h>
+#include "structs.h"
 
 int main(int argc, char* argv[])
 {
@@ -24,5 +25,13 @@ int main(int argc, char* argv[])
 		printf("%c",c);
 	}
 	fclose(f);
+	printf("Enter name for applicant1: ");
+	applicant a1;
+	a1.name = malloc(20);
+	scanf("%s", a1.name);
+	printf("Enter id for a1: ");
+	scanf("%lu", &a1.id);
+	printf("%s's id is %lu.\n", a1.name, a1.id);
+	free(a1.name);
 	return 0;
 }
