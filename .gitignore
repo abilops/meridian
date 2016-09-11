@@ -1,0 +1,5 @@
+#Ignore all ending in o and a
+*.[oa]
+~*
+core
+main
