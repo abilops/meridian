@@ -1,13 +1,14 @@
+#Meridian
 Meridian is created to solve the problem of allocating low-supply things that have a high demand.
 Applications include (but are not limited to):
-	- Students applying for college. Merit based on marks
-	- Auctions?
-	- Can't think of anything else right now
+  + Students applying for college. Merit based on marks
+  + Auctions?
+  + Can't think of anything else right now
 
 Proposed design for the working of Meridian:
-	Independent files contain specific data.
-	COLLEGES.dat: Contains list of colleges with ID's and number of seats
-	STUDENTS.dat: Contains list of students with ID's, preferences and marks
+  +Independent files contain specific data.
+  +COLLEGES.dat (called c for easy typing): Contains list of colleges with ID's and number of seats
+  +STUDENTS.dat (called s for easy typing): Contains list of students with ID's, preferences and marks
 
 	Meridian will first load STUDENTS.dat into memory and sort it in descending order of marks.
 	This new data will be added to a file called STUDENTS-s.dat
