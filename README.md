@@ -23,4 +23,3 @@ Proposed design for the working of Meridian:
 	Once, either every available seat is taken or all students are done, the process exits, leaving `STUDENTS-s.dat`, `COLLEGES-r.dat` and more importantly, `RESULTS.dat` in its wake. This file will be a CSV for easy printing and importing in Microsoft Excel.
 
 	Meridian will be designed not to make changes to the input files at all. It will be as lightweight as possible.
-	The lighter it is, the larger is the amount of data it will be able to handle.
