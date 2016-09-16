@@ -7,6 +7,7 @@
 #include "structs.h"
 
 void getnextcol(FILE* file, char* plate);
+void sort(applicant people[]);
 
 int main(int argc, char* argv[])
 {
@@ -55,6 +56,21 @@ int main(int argc, char* argv[])
 	}
 	free(buffer);
 	fclose(appf);
+	printf("Loaded student data into memory\n");
+	sort(people);
+
+	FILE* sappf = fopen("sorted_students.dat",'w');
+	fclose(sappf);
+
+	// load colleges into memory
+
+	// start with people[0]
+
+	// WRITE OUT: student-college.dat
+
+	// WRITE OUT: college[x]-students.dat
+
+	// ready to unload!
 	
 	for (int i = 0; i < appnum; i++)
 	{
@@ -79,4 +95,11 @@ void getnextcol(FILE* file, char* plate)
 		c = fgetc(file);
 	}
 	plate[pindex] = '\0';
+}
+
+void sort (applicant people[])
+{
+	printf("Sorting not yet implemented.\n/
+	Assuming that input is already sorted.");
+	return;
 }
