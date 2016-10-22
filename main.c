@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 		pic->prefs = malloc(strlen(buffer));
 		strcpy(pic->prefs, buffer);
 	}
-	free(buffer);
+	//free(buffer);
 	fclose(appf);
 	printf("Loaded student data into memory\n");
 	sort(people);
@@ -69,8 +69,56 @@ int main(int argc, char* argv[])
 	fclose(sappf);
 
 	// load colleges into memory
+	FILE* dems = fopen(argv[1], "r");
+	if (dems == NULL)
+	{
+		printf("Error opening file.\n");
+		fclose(dems);
+		return -1;
+	}
+	// Find number of applicants
+	unsigned int collnum = 0;
+	for (char c = fgetc(dems); c != EOF; c = fgetc(dems))
+	{
+		if (c == '\n')
+		{
+			collnum++;
+		}
+	}
+
+	// Array of demand options
+	demand demands[collnum];
+
+	buffer[0] = '\0';
+	// Set pointer back to beginning
+	fseek(dems, 0, SEEK_SET);
+	for (int i = 0; i < collnum; i++)
+	{
+		// Init demand in context for easy typing
+		demand* dic = &demands[i];
+		getnextcol(dems, buffer);
+		dic->id = atoi(buffer);
+		getnextcol(dems,buffer);
+		dic->name = malloc(strlen(buffer));
+		strcpy(dic->name, buffer);
+		getnextcol(dems,buffer);
+		dic->seats = atoi(buffer);
+	}
+	free(buffer);
+	fclose(dems);
+	printf("Loaded college data into memory\n");
 
 	// start with people[0]
+	FILE* appf = fopen(argv[2], "r");
+	if (appf == NULL)
+	{
+		printf("Can't open file\n");
+		return;
+	}
+	for (i = 0; i < appnum; i++)
+	{
+		// TODO	
+	}
 
 	// WRITE OUT: student-college.dat
 
@@ -83,6 +131,12 @@ int main(int argc, char* argv[])
 		printf("%lu|%s\n%d|%s\n", pic->id, pic->name, pic->marks, pic->prefs);
 		free(people[i].name);
 		free(people[i].prefs);
+	}
+	for (int i = 0; i < collnum; i++)
+	{
+		demand* dic = &demands[i];
+		printf("%lu|%s|%u\n", dic->id, dic->name, dic->seats);
+		free(demands[i].name);
 	}
 	return 0;
 }
@@ -100,6 +154,11 @@ void getnextcol(FILE* file, char* plate)
 		c = fgetc(file);
 	}
 	plate[pindex] = '\0';
+}
+
+void getnextline(FILE* file, char* plate)
+{
+	// TODO
 }
 
 void sort (applicant people[])
