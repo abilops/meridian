@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "structs.h"
 
+#define INT_SIZE 2
 void getnextcol(FILE* file, char* plate);
 void sort(applicant people[]);
 
@@ -52,14 +53,19 @@ int main(int argc, char* argv[])
 		strcat(pic->name, buffer);
 		getnextcol(appf,buffer);
 		pic->prefs = malloc(strlen(buffer));
-		strcat(pic->prefs, buffer);
+		strcpy(pic->prefs, buffer);
 	}
 	free(buffer);
 	fclose(appf);
 	printf("Loaded student data into memory\n");
 	sort(people);
 
-	FILE* sappf = fopen("sorted_students.dat",'w');
+	FILE* sappf = fopen("sorted_students.dat","w");
+	for (int i = 0; i < appnum; i++)
+	{
+		applicant* pic = &people[i];
+		fprintf(sappf, "%lu,%s,%u,%s\n", pic->id, pic->name, pic->marks, pic->prefs);
+	}
 	fclose(sappf);
 
 	// load colleges into memory
@@ -71,7 +77,6 @@ int main(int argc, char* argv[])
 	// WRITE OUT: college[x]-students.dat
 
 	// ready to unload!
-	
 	for (int i = 0; i < appnum; i++)
 	{
 		applicant* pic = &people[i];
@@ -99,7 +104,6 @@ void getnextcol(FILE* file, char* plate)
 
 void sort (applicant people[])
 {
-	printf("Sorting not yet implemented.\n/
-	Assuming that input is already sorted.");
+	printf("Sorting not yet implemented.\nAssuming that input is already sorted.");
 	return;
 }
