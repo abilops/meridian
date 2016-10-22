@@ -3,6 +3,7 @@ typedef struct applicant {
 	unsigned long int id;
 	char* prefs;
 	unsigned int marks;
+	unsigned long int supply;
 } applicant;
 
 typedef struct demand {

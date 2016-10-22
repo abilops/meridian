@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include "structs.h"
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
 	printf("Loaded student data into memory\n");
 	sort(people);
 
-	FILE* sappf = fopen("sorted_students.dat","w");
+	FILE* sappf = fopen(".tempsorted","w");
 	for (int i = 0; i < appnum; i++)
 	{
 		applicant* pic = &people[i];
@@ -68,6 +69,12 @@ int main(int argc, char* argv[])
 	}
 	fclose(sappf);
 
+	// ready to unload!
+	for (int i = 0; i < appnum; i++)
+	{
+		free(people[i].name);
+		free(people[i].prefs);
+	}
 	// load colleges into memory
 	FILE* dems = fopen(argv[1], "r");
 	if (dems == NULL)
@@ -104,40 +111,83 @@ int main(int argc, char* argv[])
 		getnextcol(dems,buffer);
 		dic->seats = atoi(buffer);
 	}
-	free(buffer);
 	fclose(dems);
 	printf("Loaded college data into memory\n");
 
 	// start with people[0]
-	FILE* appf = fopen(argv[2], "r");
+	appf = fopen(".tempsorted", "r");
 	if (appf == NULL)
 	{
 		printf("Can't open file\n");
-		return;
+		return -1;
 	}
-	for (i = 0; i < appnum; i++)
+	FILE* result = fopen(argv[3], "w");
+	if (result == NULL)
 	{
-		// TODO	
+		printf("Can't open file\n");
+		return -1;
 	}
-
+	for (int i = 0; i < appnum; i++)
+	{
+		// get data
+		applicant* pic = &people[i];
+		getnextcol(appf,buffer);
+		pic->id = atoi(buffer);
+		getnextcol(appf,buffer);
+		pic->name = malloc(strlen(buffer));
+		strcpy(pic->name, buffer);
+		getnextcol(appf, buffer);
+		pic->marks = atoi(buffer);
+		getnextcol(appf,buffer);
+		pic->prefs = malloc(strlen(buffer));
+		strcpy(pic->prefs, buffer);
+		// extract preferences and assign college
+		for (int k = 0, n = strlen(pic->prefs); k < n; k++)
+		{
+			while (!isdigit(pic->prefs[k]))
+			{ k++;}
+			int bindex = 0;
+			buffer[0] = '\0';
+			while (isdigit(pic->prefs[k]))
+			{
+				buffer[bindex] = pic->prefs[k];
+				bindex++;
+				k++;
+			}
+			unsigned long curpref = atoi(buffer);
+			pic->supply = 4294967295;
+			for (int l = 0; l < collnum; l++)
+			{
+				if (demands[l].id == curpref && demands[l].seats > 0)
+				{
+					pic->supply = demands[l].id;
+					demands[l].seats--;
+					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name);
+					break;
+				}
+			}
+			if (!(pic->supply == 4294967295))
+			{
+				break;
+			}
+		}
+		free(pic->name);
+		free(pic->prefs);
+	}
 	// WRITE OUT: student-college.dat
+	fclose(appf);
+	fclose(result);
 
 	// WRITE OUT: college[x]-students.dat
 
-	// ready to unload!
-	for (int i = 0; i < appnum; i++)
-	{
-		applicant* pic = &people[i];
-		printf("%lu|%s\n%d|%s\n", pic->id, pic->name, pic->marks, pic->prefs);
-		free(people[i].name);
-		free(people[i].prefs);
-	}
+
 	for (int i = 0; i < collnum; i++)
 	{
 		demand* dic = &demands[i];
 		printf("%lu|%s|%u\n", dic->id, dic->name, dic->seats);
 		free(demands[i].name);
 	}
+	free(buffer);
 	return 0;
 }
 
@@ -156,10 +206,10 @@ void getnextcol(FILE* file, char* plate)
 	plate[pindex] = '\0';
 }
 
-void getnextline(FILE* file, char* plate)
+/* void getnextline(FILE* file, char* plate)
 {
 	// TODO
-}
+} */
 
 void sort (applicant people[])
 {
