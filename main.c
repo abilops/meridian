@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
 	// Set pointer back to beginning
 	fseek(appf, 0, SEEK_SET);
 	char* buffer = malloc(81);
+	// load all applicants into memory for sort
 	for (int i = 0; i < appnum; i++)
 	{
 		// Init person in context for easy typing
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
 	printf("Loaded student data into memory\n");
 	sort(people);
 
+	// Sorted APPlicant FILE
 	FILE* sappf = fopen(".tempsorted","w");
 	for (int i = 0; i < appnum; i++)
 	{
@@ -77,13 +79,15 @@ int main(int argc, char* argv[])
 	}
 	// load colleges into memory
 	FILE* dems = fopen(argv[1], "r");
+	// TODO I think I need a function for this
 	if (dems == NULL)
 	{
 		printf("Error opening file.\n");
 		fclose(dems);
 		return -1;
 	}
-	// Find number of applicants
+	// Find number of demands
+	// TODO need a function for this too
 	unsigned int collnum = 0;
 	for (char c = fgetc(dems); c != EOF; c = fgetc(dems))
 	{
@@ -102,6 +106,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < collnum; i++)
 	{
 		// Init demand in context for easy typing
+		// TODO function for this
 		demand* dic = &demands[i];
 		getnextcol(dems, buffer);
 		dic->id = atoi(buffer);
@@ -130,6 +135,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < appnum; i++)
 	{
 		// get data
+		// TODO function for this
 		applicant* pic = &people[i];
 		getnextcol(appf,buffer);
 		pic->id = atoi(buffer);
@@ -144,10 +150,12 @@ int main(int argc, char* argv[])
 		// extract preferences and assign college
 		for (int k = 0, n = strlen(pic->prefs); k < n; k++)
 		{
+			// get number between the ';'s
 			while (!isdigit(pic->prefs[k]))
 			{ k++;}
 			int bindex = 0;
 			buffer[0] = '\0';
+			// what if number is bigger than a digit?
 			while (isdigit(pic->prefs[k]))
 			{
 				buffer[bindex] = pic->prefs[k];
@@ -155,39 +163,43 @@ int main(int argc, char* argv[])
 				k++;
 			}
 			unsigned long curpref = atoi(buffer);
+			// highest number, meaning no supply
 			pic->supply = 4294967295;
 			for (int l = 0; l < collnum; l++)
 			{
+				// This is the real check
 				if (demands[l].id == curpref && demands[l].seats > 0)
 				{
 					pic->supply = demands[l].id;
 					demands[l].seats--;
+					// write to file before another segmentation fault
 					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name);
 					break;
 				}
 			}
+			// if supply is assigned, then no need to get next preference,
+			// actually, it is better to get out of that loop.
 			if (!(pic->supply == 4294967295))
 			{
 				break;
 			}
 		}
+		// only malloc'd the strlen of buffer
+		// so better to free and remalloc
 		free(pic->name);
 		free(pic->prefs);
 	}
-	// WRITE OUT: student-college.dat
 	fclose(appf);
 	fclose(result);
 
-	// WRITE OUT: college[x]-students.dat
-
+	// TODO WRITE OUT: college[x]-students.dat
 
 	for (int i = 0; i < collnum; i++)
 	{
-		demand* dic = &demands[i];
-		printf("%lu|%s|%u\n", dic->id, dic->name, dic->seats);
 		free(demands[i].name);
 	}
 	free(buffer);
+	// Phew
 	return 0;
 }
 
@@ -210,9 +222,12 @@ void getnextcol(FILE* file, char* plate)
 {
 	// TODO
 } */
-
+// Supposed to sort the people according to MARKS only
+// but if you are importing a CSV, then why not use
+// some spreadsheet program to sort it before the export?
 void sort (applicant people[])
 {
+	// TODO
 	printf("Sorting not yet implemented.\nAssuming that input is already sorted.");
 	return;
 }
