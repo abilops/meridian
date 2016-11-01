@@ -2,24 +2,20 @@
 Meridian is created to solve the problem of allocating low-supply things that have a high demand.
 Applications include (but are not limited to):
   + Students applying for college. Merit based on marks
-  + Auctions?
-  + Can't think of anything else right now
 
 Proposed design for the working of Meridian:
-  + Independent files contain specific data.
-  + COLLEGES.dat (called 'c' for easy typing): Contains list of colleges with ID's and number of seats
-  + `STUDENTS.dat` (called 's' for easy typing): Contains list of students with ID's, preferences and marks
+  + Independent CSV files contain specific data.
+  + One file for the demands, their seats and id
+  + Another for the applicants, their deservibility and id
 
-	Meridian will first load `STUDENTS.dat` into memory and sort it in descending order of marks.
-	This new data will be added to a file called `STUDENTS-s.dat`
-	
-	Then it will make a copy of COLLEGES.dat called `COLLEGES-r.dat`. This file will be the data for the number of seats remaining in each college (if any).
-	Then it will iterate through this list of students, from top to bottom, and start allocating him/her their first preferred college.
-	If there are no remaining seats, it will jump to the next preference.
-	Once a students fate is decided, the `RESULTS.dat` file will be appended with the ID NAME and ALLOCATED data.
-	The seats remaining in the college are updated (it is best that the changes are not written to the file one at a time).
-	There will also be another file that gives a list of students allocated to a college. But this is not a priority now.
+  It will load the applicants, then sort it and save the sorted file in `.tempsorted`.
+  After unloading the students from memory, it will load all colleges into memory.
+  Then it will read the `.tempsorted` file line-by-line and assign each student a college. Since this file is already sorted, the first priority goes to the person with the highest deservability.
+  It will write the results to the results file after each of this iteration, in case `meridian` crashes mid-way.
 
-	Once, either every available seat is taken or all students are done, the process exits, leaving `STUDENTS-s.dat`, `COLLEGES-r.dat` and more importantly, `RESULTS.dat` in its wake. This file will be a CSV for easy printing and importing in Microsoft Excel.
+  Right now, the code works just as a proof of concept. Things that I am working on right now: (`TODO`s are added to the code where necessary)
+  + Functions for file-opening, and file-reading (CSV)
+  + Hash tables for storing colleges in memory, so that I don't need to iterate over all the colleges, searching for the one matching the id.
+  + Add error capturing for unknown IDs, no memory (IMPORTANT for every malloc since this is supposed to handle very very very very large files)
 
-	Meridian will be designed not to make changes to the input files at all. It will be as lightweight as possible.
+	Meridian will be designed not to make changes to the input files at all. It will be as lightweight as possible
