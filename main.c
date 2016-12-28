@@ -115,7 +115,18 @@ int main(int argc, char* argv[])
 		strcpy(dic->name, buffer);
 		getnextcol(dems,buffer);
 		dic->seats = atoi(buffer);
-	}
+                FILE* dicf = fopen(dic->name, "w");
+                if (dicf == NULL)
+                {
+                        printf("Can't create/overwrite demands file\n");
+                        return -1;
+                }
+                else
+                {
+                    fprintf(dicf, "%s%s\n", "List of students admitted into ", dic->name);
+                    fclose(dicf);
+                }
+        }
 	fclose(dems);
 	printf("Loaded college data into memory\n");
 
@@ -173,7 +184,15 @@ int main(int argc, char* argv[])
 					pic->supply = demands[l].id;
 					demands[l].seats--;
 					// write to file before another segmentation fault
-					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name);
+					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name); 
+                                        FILE* sic = fopen(demands[l].name, "a");
+                                        if (sic == NULL)
+                                        {
+                                                printf("Can't open file\n");
+                                                return -1;
+                                        }
+                                        fprintf(sic, "%lu,%s,%d\n",  pic->id, pic->name, pic->marks);
+                                        fclose(sic);
 					break;
 				}
 			}
@@ -193,7 +212,7 @@ int main(int argc, char* argv[])
 	fclose(result);
 
 	// TODO WRITE OUT: college[x]-students.dat
-
+        
 	for (int i = 0; i < collnum; i++)
 	{
 		free(demands[i].name);
