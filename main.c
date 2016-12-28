@@ -158,6 +158,7 @@ int main(int argc, char* argv[])
 		getnextcol(appf,buffer);
 		pic->prefs = malloc(strlen(buffer));
 		strcpy(pic->prefs, buffer);
+                pic->supply = 4294967295;
 		// extract preferences and assign college
 		for (int k = 0, n = strlen(pic->prefs); k < n; k++)
 		{
@@ -165,24 +166,30 @@ int main(int argc, char* argv[])
 			while (!isdigit(pic->prefs[k]))
 			{ k++;}
 			int bindex = 0;
-			buffer[0] = '\0';
-			// what if number is bigger than a digit?
+			// what if number is longer than one digit?
 			while (isdigit(pic->prefs[k]))
 			{
 				buffer[bindex] = pic->prefs[k];
 				bindex++;
 				k++;
 			}
+			buffer[bindex] = '\0';
 			unsigned long curpref = atoi(buffer);
 			// highest number, meaning no supply
-			pic->supply = 4294967295;
+			
 			for (int l = 0; l < collnum; l++)
 			{
 				// This is the real check
-				if (demands[l].id == curpref && demands[l].seats > 0)
+				if (demands[l].id == curpref)
 				{
+                                    if (demands[l].seats > 0)
+                                    {
 					pic->supply = demands[l].id;
 					demands[l].seats--;
+                                        if (demands[l].seats == 0)
+                                        {
+                                            demands[l].cutoff = pic->marks;
+                                        }
 					// write to file before another segmentation fault
 					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name); 
                                         FILE* sic = fopen(demands[l].name, "a");
@@ -194,7 +201,21 @@ int main(int argc, char* argv[])
                                         fprintf(sic, "%lu,%s,%d\n",  pic->id, pic->name, pic->marks);
                                         fclose(sic);
 					break;
+                                    }
+                                    else if (demands[l].seats == 0)
+                                    {
+                                        
+                                        // Seats are zero, then what was the cutoff?
+                                        if (demands[l].cutoff == pic->marks)
+                                        {
+                                            // Ethical conflict!! Same marks, but no more seats. What TODO?
+                                            //TODO 
+                                            printf("ALERT: Marks of applicant %s are same as cutoff of %s\n", pic->name, demands[l].name);
+                                        }
+                                        break;
+                                    }
 				}
+				
 			}
 			// if supply is assigned, then no need to get next preference,
 			// actually, it is better to get out of that loop.
@@ -210,8 +231,6 @@ int main(int argc, char* argv[])
 	}
 	fclose(appf);
 	fclose(result);
-
-	// TODO WRITE OUT: college[x]-students.dat
         
 	for (int i = 0; i < collnum; i++)
 	{
