@@ -1,5 +1,21 @@
-meridian: main.c structs.h
-	clang-3.8 -ggdb3 -O0 -std=c99 -Wall -Werror -o meridian main.c -lm
+NAME = meridian
+CSRCS = *.c
+CHDRS = $(CSRCS):.c=.h
+LIBS = -lm -lcs50
+#CC = clang
+#SET THE CC yourself in ~/.bashrc or right now
+#with "export CC=gcc"
+CFLAGS = -Wall -Werror -ggdb3
 
-clean:
-	rm -f *.o a.out core main
+all:$(NAME)
+
+#$(CSRCS) : $(CHDRS)
+
+$(NAME):$(CSRCS)
+	$(CC) $(CFLAGS) -o $(NAME) $(CSRCS) $(LIBS)
+
+clean :
+	rm $(NAME) core *.o
+
+distclean:
+	clean
