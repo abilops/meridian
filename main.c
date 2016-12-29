@@ -231,3 +231,4 @@ void sort (applicant people[])
 	printf("Sorting not yet implemented.\nAssuming that input is already sorted.");
 	return;
 }
+
