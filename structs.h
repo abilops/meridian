@@ -10,4 +10,5 @@ typedef struct demand {
 	unsigned long int id;
 	char* name;
 	unsigned int seats;
+        unsigned int cutoff;
 } demand;
