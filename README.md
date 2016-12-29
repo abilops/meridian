@@ -1,5 +1,6 @@
 #Meridian
 Meridian is created to solve the problem of allocating low-supply things that have a high demand.
+Being open souce, it gaurantees fairness and has transparent logic that everyone can verify.
 Applications include (but are not limited to):
   + Students applying for college. Merit based on marks
 
