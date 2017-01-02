@@ -115,18 +115,18 @@ int main(int argc, char* argv[])
 		strcpy(dic->name, buffer);
 		getnextcol(dems,buffer);
 		dic->seats = atoi(buffer);
-                FILE* dicf = fopen(dic->name, "w");
-                if (dicf == NULL)
-                {
-                        printf("Can't create/overwrite demands file\n");
-                        return -1;
-                }
-                else
-                {
-                    fprintf(dicf, "%s%s\n", "List of students admitted into ", dic->name);
-                    fclose(dicf);
-                }
+        FILE* dicf = fopen(dic->name, "w");
+        if (dicf == NULL)
+        {
+        	printf("Can't create/overwrite demands file\n");
+            return -1;
         }
+        else
+        {
+            fprintf(dicf, "%s%s\n", "List of students admitted into ", dic->name);
+            fclose(dicf);
+        }
+	}
 	fclose(dems);
 	printf("Loaded college data into memory\n");
 
