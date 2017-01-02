@@ -15,7 +15,7 @@ $(NAME):$(CSRCS)
 	$(CC) $(CFLAGS) -o $(NAME) $(CSRCS) $(LIBS)
 
 clean :
-	rm $(NAME) core *.o
+	rm $(NAME) core *.o .tempsorted sandbox/*
 
 distclean:
 	clean
