@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "structs.h"
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #define INT_SIZE 2
 void getnextcol(FILE* file, char* plate);
@@ -13,10 +15,27 @@ void sort(applicant people[]);
 
 int main(int argc, char* argv[])
 {
-	if (argc != 4)
+	if (argc != 4 && argc != 5)
 	{
-		printf("Usage:\n./meridian demands applicants results\n");
+		printf("Usage:\n./meridian demands applicants results [demand-dir]\n");
 		return -1;
+	}
+	// remove trailing '/' from dir path if present
+	char* ddir = NULL;
+	if (argc == 5)
+	{
+		int ignore = 0;
+		if (argv[4][strlen(argv[4]) - 1] == '/')
+		{
+		   ignore = 1;
+		}
+		ddir = malloc(strlen(argv[4]));
+		snprintf(ddir, strlen(argv[4]) - ignore + 1, "%s", argv[4]);
+	}
+	else
+	{
+		ddir = malloc(2);
+		sprintf(ddir, ".");
 	}
 	FILE* appf = fopen(argv[2], "r");
 	if (appf == NULL)
@@ -51,11 +70,20 @@ int main(int argc, char* argv[])
 		getnextcol(appf,buffer);
 		pic->id = atoi(buffer);
 		getnextcol(appf,buffer);
-		pic->name = malloc(strlen(buffer));
-		strcat(pic->name, buffer);
+		int length = strlen(buffer);
+		pic->name = malloc(length + 1);
+		/* 
+		   TODO INDUCTION OF BUG POSSIBLE
+		   YOUR MISTAKE. Not enough comments.
+		   What can I do? 
+		   Remove this when confirmed.
+		 */
+		// Why was this CAT and not CPY?
+		strncpy(pic->name, buffer, length + 1);
 		getnextcol(appf,buffer);
-		pic->prefs = malloc(strlen(buffer));
-		strcpy(pic->prefs, buffer);
+		length = strlen(buffer);
+		pic->prefs = malloc(length + 1);
+		strncpy(pic->prefs, buffer, length + 1);
 	}
 	//free(buffer);
 	fclose(appf);
@@ -103,6 +131,7 @@ int main(int argc, char* argv[])
 	buffer[0] = '\0';
 	// Set pointer back to beginning
 	fseek(dems, 0, SEEK_SET);
+	char* filename = malloc(strlen(ddir) + 81);
 	for (int i = 0; i < collnum; i++)
 	{
 		// Init demand in context for easy typing
@@ -111,14 +140,16 @@ int main(int argc, char* argv[])
 		getnextcol(dems, buffer);
 		dic->id = atoi(buffer);
 		getnextcol(dems,buffer);
-		dic->name = malloc(strlen(buffer));
-		strcpy(dic->name, buffer);
+		int length = strlen(buffer);
+		dic->name = malloc(length+1);
+		strncpy(dic->name, buffer, length + 1);
 		getnextcol(dems,buffer);
 		dic->seats = atoi(buffer);
-        FILE* dicf = fopen(dic->name, "w");
+		sprintf(filename, "%s/%s", ddir, dic->name);
+        FILE* dicf = fopen(filename, "w");
         if (dicf == NULL)
         {
-        	printf("Can't create/overwrite demands file\n");
+        	printf("Can't create/overwrite demand file\n");
             return -1;
         }
         else
@@ -151,14 +182,16 @@ int main(int argc, char* argv[])
 		getnextcol(appf,buffer);
 		pic->id = atoi(buffer);
 		getnextcol(appf,buffer);
-		pic->name = malloc(strlen(buffer));
-		strcpy(pic->name, buffer);
+		int length = strlen(buffer);
+		pic->name = malloc(length + 1);
+		strncpy(pic->name, buffer, length + 1);
 		getnextcol(appf, buffer);
 		pic->marks = atoi(buffer);
 		getnextcol(appf,buffer);
-		pic->prefs = malloc(strlen(buffer));
-		strcpy(pic->prefs, buffer);
-                pic->supply = 4294967295;
+		length = strlen(buffer);
+		pic->prefs = malloc(length + 1);
+		strncpy(pic->prefs, buffer, length + 1);
+        pic->supply = 4294967295;
 		// extract preferences and assign college
 		for (int k = 0, n = strlen(pic->prefs); k < n; k++)
 		{
@@ -192,7 +225,8 @@ int main(int argc, char* argv[])
                                         }
 					// write to file before another segmentation fault
 					fprintf(result, "%lu,%d,%s,%lu,%s\n", pic->id, pic->marks, pic->name, pic->supply, demands[l].name); 
-                                        FILE* sic = fopen(demands[l].name, "a");
+					sprintf(filename, "%s/%s", ddir, demands[l].name);
+                                        FILE* sic = fopen(filename, "a");
                                         if (sic == NULL)
                                         {
                                                 printf("Can't open file\n");
@@ -236,6 +270,7 @@ int main(int argc, char* argv[])
 	{
 		free(demands[i].name);
 	}
+	free(filename);
 	free(buffer);
 	// Phew
 	return 0;
