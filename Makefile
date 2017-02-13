@@ -1,21 +1,41 @@
-NAME = meridian
-CSRCS = *.c
-CHDRS = $(CSRCS):.c=.h
-LIBS = -lm -lcs50
-#CC = clang
-#SET THE CC yourself in ~/.bashrc or right now
-#with "export CC=gcc"
-CFLAGS = -Wall -Werror -ggdb3
+#
+# Makefile
+#
+# copied from Computer Science 50 Problem Set 5
+# 
+#
 
-all:$(NAME)
 
-#$(CSRCS) : $(CHDRS)
+# compiler to use
+CC = clang
 
-$(NAME):$(CSRCS)
-	$(CC) $(CFLAGS) -o $(NAME) $(CSRCS) $(LIBS)
+# flags to pass compiler
+CFLAGS = -ggdb3 -O3 -Qunused-arguments -std=c99 -Wall -Werror -lm
 
-clean :
-	 rm -If $(NAME) .tempsorted sandbox/* dem/*
+# name for executable
+EXE = meridian
 
-distclean:
-	clean
+# space-separated list of header files
+HDRS = meridian.h
+
+# space-separated list of libraries, if any,
+# each of which should be prefixed with -l
+LIBS =
+
+# space-separated list of source files
+SRCS = main.c functions.c
+
+# automatically generated list of object files
+OBJS = $(SRCS:.c=.o)
+
+
+# default target
+$(EXE): $(OBJS) $(HDRS) Makefile
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+
+# dependencies 
+$(OBJS): $(HDRS) Makefile
+
+# housekeeping
+clean:
+	rm -f core $(EXE) *.o .tempsorted sandbox/* dem/*
